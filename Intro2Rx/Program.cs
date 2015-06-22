@@ -8,31 +8,23 @@ namespace Intro2Rx
 {
     class Program
     {
+        /**
+         * AsyncSubject<T> is similar to the Replay and Behavior subjects in the way that it caches values, 
+         * however it will only store the last value, and only publish it when the sequence is completed. 
+         * 
+         * The general usage of the AsyncSubject<T> is to only ever publish one value then immediately complete. 
+         * This means that is becomes quite comparable to Task<T>.
+         */
         static void Main(string[] args)
         {
-            //BehaviorSubject only remembers the last publication.
-            //Need to provide a default value. This means that all subscribers will receive a value immediately (unless it is already completed).
-            var subject = new BehaviorSubject<string>("a");
+            var subject = new AsyncSubject<string>();
+            subject.OnNext("a");
+            WriteSequenceToConsole(subject);
             subject.OnNext("b");
             subject.OnNext("c");
-            
-            subject.Subscribe(Console.WriteLine);
-
-            subject.OnNext("d");
-
+            //This make a huge difference.
             subject.OnCompleted();
 
-            /*
-            * That note that there is a difference between a ReplaySubject<T> with a buffer size of one (commonly called a 'replay one subject') and a BehaviorSubject<T>. 
-            * 
-            * 1. A BehaviorSubject<T> requires an initial value. 
-            *    With the assumption that neither subjects have completed, then you can be sure that the BehaviorSubject<T> will have a value. 
-            *    You cannot be certain with the ReplaySubject<T> however
-            * 
-            * 2. Another difference is that a replay-one-subject will still cache its value once it has been completed. 
-            *    So subscribing to a completed BehaviorSubject<T> we can be sure to not receive any values, 
-            *    but with a ReplaySubject<T> it is possible.
-            */
         }
 
         //Takes an IObservable<string> as its parameter. 
