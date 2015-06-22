@@ -6,6 +6,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading;
+using System.Timers;
 
 namespace Intro2Rx
 {
@@ -13,10 +14,36 @@ namespace Intro2Rx
     {
         static void Main(string[] args)
         {
-//            BlockingMethod().Subscribe(x => Console.WriteLine("value is {0}", x));
-
-            NonBlocking().Subscribe(x => Console.WriteLine("value is {0}", x));
+            NonBlocking_event_driven();
         }
+
+        //Example code only
+        public static void NonBlocking_event_driven()
+        {
+            var ob = Observable.Create<string>(observer => {
+                var timer = new System.Timers.Timer();
+                timer.Interval = 1000;
+                //2 action happen here.
+                timer.Elapsed += (s, e) => observer.OnNext("tick"); 
+                timer.Elapsed += OnTimerElapsed;
+                timer.Start();
+        
+                return Disposable.Empty;
+            });
+
+            //simple subscription.
+            var subscription = ob.Subscribe(Console.WriteLine);
+            Console.ReadLine();
+            
+            subscription.Dispose();
+        }
+
+        private static void OnTimerElapsed(object sender, ElapsedEventArgs e)
+        {
+            Console.WriteLine(e.SignalTime);
+        }
+
+
 
         private static IObservable<string> BlockingMethod()
         {
