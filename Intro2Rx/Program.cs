@@ -10,16 +10,17 @@ namespace Intro2Rx
         static void Main(string[] args)
         {
             /*
-             * Tips:
-             * 
-             * Subject class implement IObserver and IObeservable
-             * 
-               public sealed class Subject<T> : ISubject<T>, ISubject<T, T>, IObserver<T>, IObservable<T>, IDisposable
+             * Subject's siblings:
+             * ReplaySubject<T> provides the feature of caching values and then replaying them for any late subscriptions.
              */
-            var subject = new Subject<string>();
-            WriteSequenceToConsole(subject);
+            
+//            var subject = new Subject<string>();
+            var subject = new ReplaySubject<string>();
 
-            subject.OnNext("a");
+            subject.OnNext("a");  //If subject is of Subject type, then 'a' won't be played.
+                                  //or of ReplaySubject type, then full subscription will be played.
+
+            WriteSequenceToConsole(subject);
             subject.OnNext("b");
             subject.OnNext("c");
             Console.ReadKey();
