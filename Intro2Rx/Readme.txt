@@ -1,4 +1,8 @@
-﻿Managing events like these is what Rx was built for:
+﻿This repo holds practicing code for tutorial: Intro to Rx
+http://www.introtorx.com/
+
+
+Managing events like these is what Rx was built for:
 
 UI events like mouse move, button click
 
@@ -19,3 +23,11 @@ also uses LINQ to build queries over streaming events of data.
 
 microsoft concurrent page: http://msdn.microsoft.com/en-us/concurrency
 
+read until with Diigo annotation.
+http://www.introtorx.com/Content/v1.0.10621.0/04_CreatingObservableSequences.html
+
+ref
+https://www.youtube.com/watch?v=iVhYCCrUHw8
+
+his github and blog
+http://leecampbell.blogspot.com.au/2010/08/reactive-extensions-for-net.html
