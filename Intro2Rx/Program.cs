@@ -9,21 +9,14 @@ namespace Intro2Rx
     {
         static void Main(string[] args)
         {
-            /*
-             * Subject's siblings:
-             * ReplaySubject<T> provides the feature of caching values and then replaying them for any late subscriptions.
-             */
-            
-//            var subject = new Subject<string>();
-            var subject = new ReplaySubject<string>();
+            var bufferSize = 2;
+            var subject = new ReplaySubject<string>(bufferSize);
+            subject.OnNext("a");
 
-            subject.OnNext("a");  //If subject is of Subject type, then 'a' won't be played.
-                                  //or of ReplaySubject type, then full subscription will be played.
-
-            WriteSequenceToConsole(subject);
             subject.OnNext("b");
             subject.OnNext("c");
-            Console.ReadKey();
+            subject.Subscribe(Console.WriteLine);
+            subject.OnNext("d");
         }
 
         //Takes an IObservable<string> as its parameter. 
