@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading;
@@ -11,17 +13,35 @@ namespace Intro2Rx
     {
         static void Main(string[] args)
         {
-//            var singleValue = Observable.Return<string>("Value");
-            
-            //Can be reduced to the following
-            var singleValue = Observable.Return("Value");
+//            BlockingMethod().Subscribe(x => Console.WriteLine("value is {0}", x));
 
-            //Equivalent to, below:
+            NonBlocking().Subscribe(x => Console.WriteLine("value is {0}", x));
+        }
 
-            //which could have also been simulated with a replay subject
+        private static IObservable<string> BlockingMethod()
+        {
             var subject = new ReplaySubject<string>();
-            subject.OnNext("Value");
+            subject.OnNext("a");
+            subject.OnNext("b");
             subject.OnCompleted();
+
+            Thread.Sleep(3000);
+            return subject;
+        }
+
+        private static IObservable<string> NonBlocking()
+        {
+            //Type info can be avoided.
+            return Observable.Create<string>((IObserver<string> observer) => {
+                observer.OnNext("a");
+                observer.OnNext("b");
+                observer.OnCompleted();
+
+                Thread.Sleep(3000);
+                return Disposable.Create(() => Console.WriteLine("Observer has unsubscribed"));
+                //or can return an Action like 
+                //return () => Console.WriteLine("Observer has unsubscribed"); 
+            });
         }
 
         // Takes an IObservable<string> as its parameter. 
