@@ -10,28 +10,29 @@ namespace Intro2Rx
     {
         static void Main(string[] args)
         {
-            var values = new Subject<int>();
-            
-            var firstSubscription = values.Subscribe(value =>
-            Console.WriteLine("1st subscription received {0}", value));
+//            var subject = new Subject<int>();
+//         
+//            subject.Subscribe(
+//                Console.WriteLine,
+//                () => Console.WriteLine("Completed"));
+//
+//            subject.OnCompleted();
+//            subject.OnNext(2);
 
-            var secondSubscription = values.Subscribe(value =>
-            Console.WriteLine("2nd subscription received {0}", value));
-            
-            values.OnNext(0);
-            values.OnNext(1);
-            values.OnNext(2);
-            values.OnNext(3);
-
-            firstSubscription.Dispose();
-            Console.WriteLine("Disposed of 1st subscription");
-            
-            values.OnNext(4);
-            values.OnNext(5);
+            Console.WriteLine("Normal color");
+            using (new ConsoleColor(System.ConsoleColor.Red))
+            {
+                Console.WriteLine("Now I am Red");
+                using (new ConsoleColor(System.ConsoleColor.Green))
+                {
+                    Console.WriteLine("Now I am Green");
+                }
+                Console.WriteLine("and back to Red");
+            }
         }
 
-        //Takes an IObservable<string> as its parameter. 
-        //Subject<string> implements this interface.
+        // Takes an IObservable<string> as its parameter. 
+        // Subject<string> implements this interface.
         static void WriteSequenceToConsole(IObservable<string> sequence)
         {
             //The next two lines are equivalent.

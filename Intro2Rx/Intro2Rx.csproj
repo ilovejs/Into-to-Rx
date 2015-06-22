@@ -57,6 +57,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConsoleColor.cs" />
     <Compile Include="MyConsoleObserver.cs" />
     <Compile Include="MySequenceOfNumbers.cs" />
     <Compile Include="Program.cs" />
