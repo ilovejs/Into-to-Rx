@@ -10,27 +10,29 @@ namespace Intro2Rx
     {
         static void Main(string[] args)
         {
-            /*
-             In the example the window was specified as 150 milliseconds. Values are published 100 milliseconds apart. 
-             * 
-             * Once we have subscribed to the subject, 
-             * 
-             * the first value is 200ms old and as such has expired and been removed from the cache.
-             */
-            var window = TimeSpan.FromMilliseconds(150);
-            var subject = new ReplaySubject<string>(window);
+            //BehaviorSubject only remembers the last publication.
+            //Need to provide a default value. This means that all subscribers will receive a value immediately (unless it is already completed).
+            var subject = new BehaviorSubject<string>("a");
+            subject.OnNext("b");
+            subject.OnNext("c");
             
-            subject.OnNext("w");
-            Thread.Sleep(TimeSpan.FromMilliseconds(100));
-            
-            subject.OnNext("x");
-            Thread.Sleep(TimeSpan.FromMilliseconds(100));
-            
-            subject.OnNext("y");
             subject.Subscribe(Console.WriteLine);
-            subject.OnNext("z");
 
-            //w--x--yz is time sequence, w is out of date when subscribe to handler
+            subject.OnNext("d");
+
+            subject.OnCompleted();
+
+            /*
+            * That note that there is a difference between a ReplaySubject<T> with a buffer size of one (commonly called a 'replay one subject') and a BehaviorSubject<T>. 
+            * 
+            * 1. A BehaviorSubject<T> requires an initial value. 
+            *    With the assumption that neither subjects have completed, then you can be sure that the BehaviorSubject<T> will have a value. 
+            *    You cannot be certain with the ReplaySubject<T> however
+            * 
+            * 2. Another difference is that a replay-one-subject will still cache its value once it has been completed. 
+            *    So subscribing to a completed BehaviorSubject<T> we can be sure to not receive any values, 
+            *    but with a ReplaySubject<T> it is possible.
+            */
         }
 
         //Takes an IObservable<string> as its parameter. 
