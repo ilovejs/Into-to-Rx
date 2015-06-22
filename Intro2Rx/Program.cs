@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Subjects;
+using System.Threading;
 
 namespace Intro2Rx
 {
@@ -9,14 +10,27 @@ namespace Intro2Rx
     {
         static void Main(string[] args)
         {
-            var bufferSize = 2;
-            var subject = new ReplaySubject<string>(bufferSize);
-            subject.OnNext("a");
-
-            subject.OnNext("b");
-            subject.OnNext("c");
+            /*
+             In the example the window was specified as 150 milliseconds. Values are published 100 milliseconds apart. 
+             * 
+             * Once we have subscribed to the subject, 
+             * 
+             * the first value is 200ms old and as such has expired and been removed from the cache.
+             */
+            var window = TimeSpan.FromMilliseconds(150);
+            var subject = new ReplaySubject<string>(window);
+            
+            subject.OnNext("w");
+            Thread.Sleep(TimeSpan.FromMilliseconds(100));
+            
+            subject.OnNext("x");
+            Thread.Sleep(TimeSpan.FromMilliseconds(100));
+            
+            subject.OnNext("y");
             subject.Subscribe(Console.WriteLine);
-            subject.OnNext("d");
+            subject.OnNext("z");
+
+            //w--x--yz is time sequence, w is out of date when subscribe to handler
         }
 
         //Takes an IObservable<string> as its parameter. 
