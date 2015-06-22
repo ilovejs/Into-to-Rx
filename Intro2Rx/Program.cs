@@ -8,23 +8,17 @@ namespace Intro2Rx
 {
     class Program
     {
-        /**
-         * AsyncSubject<T> is similar to the Replay and Behavior subjects in the way that it caches values, 
-         * however it will only store the last value, and only publish it when the sequence is completed. 
-         * 
-         * The general usage of the AsyncSubject<T> is to only ever publish one value then immediately complete. 
-         * This means that is becomes quite comparable to Task<T>.
-         */
+        
         static void Main(string[] args)
         {
-            var subject = new AsyncSubject<string>();
+            var subject = new Subject<string>();
+            subject.Subscribe(Console.WriteLine);
             subject.OnNext("a");
-            WriteSequenceToConsole(subject);
             subject.OnNext("b");
-            subject.OnNext("c");
-            //This make a huge difference.
             subject.OnCompleted();
-
+            //once a sequence is completed, no more activity can happen on that sequence.
+            //so 'c' won't be printed.
+            subject.OnNext("c");
         }
 
         //Takes an IObservable<string> as its parameter. 
