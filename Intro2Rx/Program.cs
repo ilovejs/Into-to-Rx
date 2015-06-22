@@ -45,7 +45,13 @@ namespace Intro2Rx
                     01/01/2012 12:00:04
                     01/01/2012 12:00:05
                  */
-                return timer;
+
+                //Use an action to un-register the event handler, preventing a memory leak by retaining the reference to the timer.
+                return () =>
+                {
+                    timer.Elapsed -= OnTimerElapsed;
+                    timer.Dispose();
+                };
 
 //                return Disposable.Empty;
             });
