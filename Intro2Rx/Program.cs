@@ -8,17 +8,32 @@ namespace Intro2Rx
 {
     class Program
     {
-        
         static void Main(string[] args)
         {
-            var subject = new Subject<string>();
-            subject.Subscribe(Console.WriteLine);
-            subject.OnNext("a");
-            subject.OnNext("b");
-            subject.OnCompleted();
-            //once a sequence is completed, no more activity can happen on that sequence.
-            //so 'c' won't be printed.
-            subject.OnNext("c");
+            /*
+             * 
+            var values = new Subject<int>();
+            try
+            {
+                values.Subscribe(value => Console.WriteLine("1st subscription received {0}", value));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Won't catch anything here!");
+            }
+            values.OnNext(0);
+            //Exception will be thrown here causing the app to fail.
+            values.OnError(new Exception("Dummy exception"));
+             */
+            
+            var values = new Subject<int>();
+            
+            values.Subscribe(
+                value => Console.WriteLine("1st subscription received {0}", value),
+                ex => Console.WriteLine("Caught an exception : {0}", ex));
+            
+            values.OnNext(0);
+            values.OnError(new Exception("Dummy exception"));
         }
 
         //Takes an IObservable<string> as its parameter. 
