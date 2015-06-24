@@ -19,7 +19,7 @@ namespace Intro2Rx
     {
         static void Main(string[] args)
         {
-            SequenceEqual();
+            GroupBy();
 
             Console.ReadKey();
         }
@@ -386,9 +386,71 @@ namespace Intro2Rx
 
         #region Aggregation
 
+        static void Min()
+        {
+            var numbers = new Subject<int>();
+
+            //extension methods
+            numbers.Dump("numbers");
+            numbers.Min().Dump("Min");
+            numbers.Average().Dump("Average");
+
+            numbers.OnNext(1);
+            numbers.OnNext(2);
+            numbers.OnNext(3);
+            numbers.OnCompleted();
+        }
+
+        static void Scan()
+        {
+            /*
+             Aggregate is also not a good fit for infinite sequences. 
+             * The Scan extension method however meets this requirement perfectly. 
+             * The signatures for both Scan and Aggregate are the same; 
+             * the difference is that Scan will push the result from every call to the accumulator function. 
+             * 
+             * So instead of being an aggregator that reduces a sequence to a single value sequence, 
+             * it is an accumulator that we return an accumulated value for each value of the source sequence.
+             */
+            var numbers = new Subject<int>();
+            var scan = numbers.Scan(0, (acc, current) => acc + current);
+            numbers.Dump("numbers");
+            scan.Dump("scan");
+            numbers.OnNext(1);
+            numbers.OnNext(2);
+            numbers.OnNext(3);
+            numbers.OnCompleted();
+        }
+
+        static void GroupBy()
+        {
+            //it is not good practice to have these nested subscribe calls:
+//            var source = Observable.Interval(TimeSpan.FromSeconds(0.1)).Take(10);
+//
+//            var group = source.GroupBy(i => i % 3);
+//
+//            group.Subscribe(grp =>
+//                grp.Min().Subscribe(
+//                    minValue =>
+//                        Console.WriteLine("{0} min value = {1}", grp.Key, minValue)),
+//                        () => Console.WriteLine("Completed"));
+    
+            var source = Observable.Interval(TimeSpan.FromSeconds(0.1)).Take(10);
+            
+            var group = source.GroupBy(i => i % 3);
+            //project and merge into diff seq
+            group.SelectMany(
+                grp => grp.Max()
+                          .Select(value => new { grp.Key, value }))
+                          .Dump("group");
+        }
+
 
         #endregion
 
+        #region Transformation of sequences
+            
+        #endregion
 #endregion
 
         public static void NonBlocking_event_driven()
@@ -476,5 +538,7 @@ namespace Intro2Rx
             //Extension Method doc: https://msdn.microsoft.com/en-us/library/system.observableextensions(v=VS.103).aspx
             sequence.Subscribe(Console.WriteLine);
         }
+
+        
     }
 }

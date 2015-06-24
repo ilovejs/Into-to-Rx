@@ -43,3 +43,15 @@ Jeffery van Gogh gives a brilliant walk through of the Observable.FromAsyncPatte
 series.  http://blogs.msdn.com/b/jeffva/archive/2010/07/23/rx-on-the-server-part-1-of-n-asynchronous-system-io-stream-reading.aspx
 While the theory backing the Rx on the Server series is sound, it was written in mid 2010 and targets an old version of Rx.
 
+Usage:
+
+Partitions of Data
+	You may partition data from a single source so that it can easily be filtered and shared to many sources. Partitioning data may also be useful for aggregates as we have seen. This is commonly done with the GroupBy operator.
+Online Game servers
+	Consider a sequence of servers. New values represent a server coming online. The value itself is a sequence of latency values allowing the consumer to see real time information of quantity and quality of servers available. If a server went down then the inner sequence can signify that by completing.
+Financial data streams
+	New markets or instruments may open and close during the day. These would then stream price information and could complete when the market closes.
+Chat Room
+	Users can join a chat (outer sequence), leave messages (inner sequence) and leave a chat (completing the inner sequence).
+File watcher
+	As files are added to a directory they could be watched for modifications (outer sequence). The inner sequence could represent changes to the file, and completing an inner sequence could represent deleting the file.
