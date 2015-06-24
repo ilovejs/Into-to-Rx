@@ -31,3 +31,15 @@ https://www.youtube.com/watch?v=iVhYCCrUHw8
 
 his github and blog
 http://leecampbell.blogspot.com.au/2010/08/reactive-extensions-for-net.html
+
+Jeffery Richter's brilliant book <CLR via C#> or Joe Duffy's comprehensive <Concurrent Programming on Windows>. 
+Most stuff on the internet is blatant plagiary of Richter's examples from his book. 
+An in-depth examination of APM is outside of the scope of this book.
+
+Transite from APM model:
+To utilize the Asynchronous Programming Model but avoid its awkward API, 
+we can use the Observable.FromAsyncPattern method. 
+Jeffery van Gogh gives a brilliant walk through of the Observable.FromAsyncPattern in Part 1 of his Rx on the Server blog 
+series.  http://blogs.msdn.com/b/jeffva/archive/2010/07/23/rx-on-the-server-part-1-of-n-asynchronous-system-io-stream-reading.aspx
+While the theory backing the Rx on the Server series is sound, it was written in mid 2010 and targets an old version of Rx.
+
