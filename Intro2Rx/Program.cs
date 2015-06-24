@@ -14,7 +14,8 @@ namespace Intro2Rx
     {
         static void Main(string[] args)
         {
-            NonBlocking_event_driven();
+            var range = Observable.Range(10, 15);
+            range.Subscribe(Console.WriteLine, () => Console.WriteLine("Completed"));
         }
 
         //Example code only
