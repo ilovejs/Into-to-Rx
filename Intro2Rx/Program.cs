@@ -19,10 +19,11 @@ namespace Intro2Rx
     {
         static void Main(string[] args)
         {
-            skipUntil_takeUntil();
+            SequenceEqual();
 
             Console.ReadKey();
         }
+
 #region Part II 
         
         #region Creating a sequence
@@ -271,9 +272,123 @@ namespace Intro2Rx
 
         #region Inspection
 
+        static void Any()
+        {
+            //subject.Any(i => i > 2);
+            //Functionally equivalent to subject.Where(i => i > 2).Any();
+
+            var subject = new Subject<int>();
+            subject.Subscribe(Console.WriteLine, () => Console.WriteLine("Subject completed"));
+            
+            var any = subject.Any();
+            any.Subscribe(b => Console.WriteLine("The subject has any values? {0}", b));
+
+            subject.OnNext(1);  //If we now remove the OnNext(1), the output will change to the following
+            subject.OnCompleted();
+        }
+
+        static void AnyWithError()
+        {
+            var subject = new Subject<int>();
+            subject.Subscribe(Console.WriteLine,
+                ex => Console.WriteLine("subject OnError : {0}", ex),
+                () => Console.WriteLine("Subject completed"));
+            var any = subject.Any();
+            any.Subscribe(b => Console.WriteLine("The subject has any values? {0}", b),
+                ex => Console.WriteLine(".Any() OnError : {0}", ex),
+                () => Console.WriteLine(".Any() completed"));
+            subject.OnError(new Exception());
+        }
+
+        static void All()
+        {
+            var subject = new Subject<int>();
+            subject.Subscribe(Console.WriteLine, () => Console.WriteLine("Subject completed"));
+            
+            var all = subject.All(i => i < 5);
+            all.Subscribe(b => Console.WriteLine("All values less than 5? {0}", b));
+            
+            subject.OnNext(1);
+            subject.OnNext(2);
+            subject.OnNext(6);    //trigger to log "All values less than 5? False"
+            subject.OnNext(2);
+            subject.OnNext(1);
+            subject.OnCompleted();
+        }
+
+        static void Contains()
+        {
+            var subject = new Subject<int>();
+            subject.Subscribe(
+                Console.WriteLine,
+                () => Console.WriteLine("Subject completed"));
+
+            //Terminate when 2 is found 
+            var contains = subject.Contains(2);
+                contains.Subscribe(
+                b => Console.WriteLine("Contains the value 2? {0}", b),
+                () => Console.WriteLine("contains completed"));
+
+            subject.OnNext(1);
+            subject.OnNext(2);
+            subject.OnNext(3);
+            subject.OnCompleted();
+        }
+
+        static void DefaultIfEmpty()
+        {
+            var subject = new Subject<int>();
+            subject.Subscribe(
+                Console.WriteLine,
+                () => Console.WriteLine("Subject completed"));
+            
+            //return a single value if the source sequence is empty
+            var defaultIfEmpty = subject.DefaultIfEmpty();
+            defaultIfEmpty.Subscribe(
+                b => Console.WriteLine("defaultIfEmpty value: {0}", b),
+                () => Console.WriteLine("defaultIfEmpty completed"));
+            
+//            subject.OnNext(1);
+//            subject.OnNext(2);
+//            subject.OnNext(3);
+            subject.OnCompleted();
+        }
+
+        static void SequenceEqual()
+        {
+            var subject1 = new Subject<int>();
+            subject1.Subscribe(
+                i => Console.WriteLine("subject1.OnNext({0})", i),
+                () => Console.WriteLine("subject1 completed"));
+
+            var subject2 = new Subject<int>();
+            subject2.Subscribe(
+                i => Console.WriteLine("subject2.OnNext({0})", i),
+                () => Console.WriteLine("subject2 completed"));
+            
+            var areEqual = subject1.SequenceEqual(subject2);
+                areEqual.Subscribe(
+                i => Console.WriteLine("areEqual.OnNext({0})", i),
+                () => Console.WriteLine("areEqual completed"));
+            
+            subject1.OnNext(1);
+            subject1.OnNext(2);
+            subject2.OnNext(1);
+            subject2.OnNext(2);
+            
+            subject2.OnNext(3);
+            subject1.OnNext(3);
+            
+            subject1.OnCompleted();
+            subject2.OnCompleted();
+        }
+        #endregion
+
+        #region Aggregation
 
 
         #endregion
+
 #endregion
 
         public static void NonBlocking_event_driven()
