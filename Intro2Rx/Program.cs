@@ -19,7 +19,7 @@ namespace Intro2Rx
     {
         static void Main(string[] args)
         {
-            GroupBy();
+            First();
 
             Console.ReadKey();
         }
@@ -386,7 +386,14 @@ namespace Intro2Rx
 
         #region Aggregation
 
-        static void Min()
+        static void Count()
+        {
+            var numbers = Observable.Range(0, 3);
+            numbers.Dump("numbers");
+            numbers.Count().Dump("count");
+        }
+
+        static void Min_Average()
         {
             var numbers = new Subject<int>();
 
@@ -401,6 +408,27 @@ namespace Intro2Rx
             numbers.OnCompleted();
         }
 
+        static void First()
+        {
+            var interval = Observable.Interval(TimeSpan.FromSeconds(3));
+            // Will block for 3s before returning
+            // If the source sequence does not have any values (i.e. is an empty sequence) then the First method will throw an exception
+            /*  You can cater for this in three ways:
+                Use a try/catch blocks around the First() call
+                Use Take(1) instead. However, this will be asynchronous, not blocking.
+                Use FirstOrDefault extension method instead, but it will still block until the source produces any notification
+             */
+            Console.WriteLine(interval.First());
+        }
+
+        static void MyAggregate()
+        {
+            // var sum = source.Aggregate((acc, currentValue) => acc + currentValue);
+
+            // See MyMin in SampleExtentions.cs
+        }
+
+        // Scan is aggregation function with initial value.
         static void Scan()
         {
             /*
@@ -422,6 +450,9 @@ namespace Intro2Rx
             numbers.OnCompleted();
         }
 
+        // More sample haven't done:
+        // http://www.introtorx.com/Content/v1.0.10621.0/07_Aggregation.html#Count
+        
         static void GroupBy()
         {
             //it is not good practice to have these nested subscribe calls:
@@ -445,11 +476,152 @@ namespace Intro2Rx
                           .Dump("group");
         }
 
+        // Section: Transformation of sequences http://www.introtorx.com/Content/v1.0.10621.0/08_Transformation.html
+
 
         #endregion
 
         #region Transformation of sequences
+
+        static void TrnasformValue()
+        {
+            var source = Observable.Range(0, 5);
+            source.Select(i => i + 3)
+                  .Dump("+3");      //All seq element +3 transformation
+        }
+        
+        static void TransformType()
+        {
+            //TIPS: 'a' = 65
+//            Observable.Range(1, 5)
+//                      .Select(i =>(char)(i + 64))
+//                      .Dump("char");
+//            
+            //Transform seq of int to anonymous types
+            Observable.Range(1, 5)
+                      .Select(i => new { Number = i, Character = (char)(i + 64) })
+                      .Dump("anon");
+
+            //Alternative to write in 'query comprehension syntax
+//            var query = from i in Observable.Range(1, 5)
+//                        select new { Number = i, Character = (char)(i + 64) };
+//                        query.Dump("anon");
+
+        }
+
+        static void Cast()
+        {
+            var objects = new Subject<object>();
+            //obj -> int
+            objects.Cast<int>().Dump("cast");
             
+            objects.OnNext(1);
+            objects.OnNext(2);
+            objects.OnNext(3);
+            //put a trap here
+            objects.OnNext("4");   //Thankfully, if this is not what we want, we could use the alternative extension method OfType<T>().
+            objects.OnCompleted();
+        }
+
+        static void OfType()
+        {
+            var objects = new Subject<object>();
+            //obj -> int
+            objects.OfType<int>().Dump("OfType");
+
+            objects.OnNext(1);
+            objects.OnNext(2);
+            
+            //put a trap here
+            objects.OnNext("4");   //Ignore the error ! :)
+
+            objects.OnNext(3);
+
+            objects.OnCompleted();
+        }
+
+        static void ImplicitCast()
+        {
+            // It is fair to say that while these are convenient methods to have, 
+            // we could have created them with the operators we already know about.
+            var objects = new Subject<object>();   //Allow object, rather than forcing to be 'int' or 'string'
+            
+//            objects.Select(i => i.ToString())
+//                   .Dump("implicit cast mimic Cast<int>() for all elem");
+
+            objects.Where(i => i is int)
+                   .Select(i => (int) i)
+                   .Dump("implicit cast mimic conditional cast");
+
+            objects.OnNext("1");
+            objects.OnNext(2);
+
+            //put a trap here
+            objects.OnNext("3");   //Ignore the error ! :)
+
+            objects.OnNext(4);
+
+            objects.OnCompleted();
+        }
+
+        static void Timestamp()
+        {
+            Observable.Interval(TimeSpan.FromSeconds(1))
+                      .Take(3)
+                      .Timestamp()
+                      .Dump("TimeStamp");
+        }
+
+        static void TimeInterval()
+        {
+            //Not exact. Need research the output
+            Observable.Interval(TimeSpan.FromSeconds(1))
+                      .Take(3)
+                      .TimeInterval()
+                      .Dump("TimeStamp");
+        }
+
+        //Hack: SelectMany is like flatMap in scala
+        static void Test_SelectMany()
+        {
+//            Observable.Return(3)
+//                      .SelectMany(i => Observable.Range(1, i))   //only print [1,2,3]
+//                      .Dump("SelectMany");
+
+            Observable.Range(1, 3)          //changed here
+                      .SelectMany(i => Observable.Range(1, i))   //print flatten result [1, 1,2, 1,2,3]
+                      .Dump("SelectMany");
+        }
+
+        static void Test_SelectMany2()
+        {
+            Func<int, char> letter = i => (char)(i + 64);
+            
+//            Observable.Return(1)
+            Observable.Range(1,3)
+                      .SelectMany(i => Observable.Return(letter(i)))   //apply a function
+                      .Dump("SelectMany");
+        }
+
+        static void Test_SelectMany3()
+        {
+            Func<int, char> letter = i => (char)(i + 64);
+            
+            Observable.Range(1, 30)
+            .SelectMany(i => {                 //WOOOOW ! This is super helpful
+                if (0 < i && i < 27)
+                {
+                    return Observable.Return(letter(i));
+                }
+                else
+                {
+                    return Observable.Empty<char>();
+                }
+            })
+            .Dump("SelectMany");
+        }
+
+
         #endregion
 #endregion
 

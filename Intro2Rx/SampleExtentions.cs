@@ -6,12 +6,18 @@ namespace Intro2Rx
 {
     public static class SampleExtentions
     {
+        /// <summary>
+        /// simply version of subscription on observable seq. 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source"></param>
+        /// <param name="name"></param>
         public static void Dump<T>(this IObservable<T> source, string name)
         {
             source.Subscribe(
-            i => Console.WriteLine("{0}-->{1}", name, i),
-            ex => Console.WriteLine("{0} failed-->{1}", name, ex.Message),
-            () => Console.WriteLine("{0} completed", name));
+            i => Console.WriteLine("{0}-->{1}", name, i),                  //onNext
+            ex => Console.WriteLine("{0} failed-->{1}", name, ex.Message), //onError
+            () => Console.WriteLine("{0} completed", name));               //onComplete
         }
 
         /*
